@@ -1,4 +1,8 @@
-# Awesome Project Build with TypeORM
+# TypeORM Benchmarks
+
+This project is a boilerplate to measure and compare queries performance.
+
+## run this project
 
 Steps to run this project:
 
