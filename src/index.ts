@@ -6,28 +6,35 @@ import { performance, PerformanceObserver } from "perf_hooks";
 
 const ITERATIONS = 1000;
 
-const markNameJoinQueryStart = "join-query-start";
-const markNameJoinQueryEnd = "join-query-end";
+const markNameJoinQuery = "join-query";
+const markNameSimpleQuery = "simple-query";
 
-const markNameSimpleQueryStart = "simple-query-start";
-const markNameSimpleQueryEnd = "simple-query-end";
+function asyncTimify<T extends any[], R>(fn: (...args: T) => R, markName) {
+  return async function timifyWrapper(...args: T): Promise<R> {
+    performance.mark(`${markName}-start`);
+    const result = await fn(...args);
+    performance.mark(`${markName}-end`);
+    return result;
+  };
+}
+
+function measure(markName) {
+  performance.measure(markName, `${markName}-start`, `${markName}-end`);
+}
 
 async function joinQuery(userId, connection: Connection) {
   const userRepository = connection.getRepository(User);
 
-  performance.mark(markNameJoinQueryStart);
   for (let i = 0; i < ITERATIONS; i++) {
     await userRepository.findOne({
       where: { id: userId },
       relations: ["education"],
     });
   }
-  performance.mark(markNameJoinQueryEnd);
 }
 
 async function simpleQuery(userId, connection: Connection) {
   const educationRepository = connection.getRepository(Education);
-  performance.mark(markNameSimpleQueryStart);
   for (let i = 0; i < ITERATIONS; i++) {
     await educationRepository.findOne({
       where: {
@@ -35,7 +42,6 @@ async function simpleQuery(userId, connection: Connection) {
       },
     });
   }
-  performance.mark(markNameSimpleQueryEnd);
 }
 createConnection()
   .then(async connection => {
@@ -54,20 +60,19 @@ createConnection()
     await education.save();
     console.log("Save a new education with id:" + education.id);
 
-    const simpleResult = simpleQuery(userId, connection);
-    const joinResult = joinQuery(userId, connection);
+    const simpleResult = asyncTimify(simpleQuery, markNameSimpleQuery)(
+      userId,
+      connection,
+    );
+
+    const joinResult = asyncTimify(joinQuery, markNameJoinQuery)(
+      userId,
+      connection,
+    );
 
     await Promise.all([joinResult, simpleResult]);
 
-    performance.measure(
-      "Join query",
-      markNameJoinQueryStart,
-      markNameJoinQueryEnd,
-    );
-    performance.measure(
-      "Simple query",
-      markNameSimpleQueryStart,
-      markNameSimpleQueryEnd,
-    );
+    measure(markNameJoinQuery);
+    measure(markNameSimpleQuery);
   })
   .catch(error => console.log(error));
