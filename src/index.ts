@@ -17,7 +17,7 @@ function measure(markName) {
   performance.measure(markName, `${markName}-start`, `${markName}-end`);
 }
 
-const ITERATIONS = 1000;
+const ITERATIONS = 10000;
 
 const joinQueryMarkName = "join-query";
 const simpleEducationQueryMarkName = "simple-education-query";
@@ -71,7 +71,7 @@ createConnection()
     const education = new Education();
     education.user = user;
     await education.save();
-    console.log("Save a new education with id:" + education.id);
+    console.log("Saved a new education with id:" + education.id);
 
     const educationResult = asyncTimify(
       simpleEducationQuery,

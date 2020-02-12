@@ -13,24 +13,24 @@ Steps to run this project:
 ## Results
 
 ```
- [
+[
   PerformanceEntry {
     name: 'simple-education-query',
     entryType: 'measure',
-    startTime: 878.200612,
-    duration: 1122.090155
+    startTime: 2113.842862,
+    duration: 6484.202455
   },
   PerformanceEntry {
     name: 'simple-user-query',
     entryType: 'measure',
-    startTime: 881.064479,
-    duration: 1083.412652
+    startTime: 2117.102796,
+    duration: 6399.785908
   },
   PerformanceEntry {
     name: 'join-query',
     entryType: 'measure',
-    startTime: 881.394741,
-    duration: 1742.951851
+    startTime: 2117.56726,
+    duration: 12433.768836
   }
 ]
 ```
